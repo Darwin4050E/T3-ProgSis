@@ -207,14 +207,48 @@ void listarTodosLosUsuarios(Persona* lista, int total) {
 
 
 char* generarClave(Persona* persona) {
+    char base[16]; 
+    int pos = 0;
 
-    // Parte de joey
+    if (persona->nombres && strlen(persona->nombres) > 0)
+        base[pos++] = toupper(persona->nombres[0]);
+    if (persona->apellidos && strlen(persona->apellidos) > 0)
+        base[pos++] = toupper(persona->apellidos[0]);
+    if (persona->ciudadResidencia && strlen(persona->ciudadResidencia) > 0)
+        base[pos++] = toupper(persona->ciudadResidencia[0]);
+    if (persona->profesion && strlen(persona->profesion) > 0)
+        base[pos++] = toupper(persona->profesion[0]);
+    if (persona->estadoCivil && strlen(persona->estadoCivil) > 0)
+        base[pos++] = toupper(persona->estadoCivil[0]);
+    if (persona->rol && strlen(persona->rol) > 0)
+        base[pos++] = toupper(persona->rol[0]);
 
-    return NULL;
+    base[pos] = '\0';
+
+    srand(time(NULL));
+    for (int i = pos - 1; i > 0; i--) {
+        int j = rand() % (i + 1);
+        char tmp = base[i];
+        base[i] = base[j];
+        base[j] = tmp;
+    }
+
+    for (int i = 0; i < pos; i++) {
+        base[i] = (char)((base[i] + persona->codigo) % 126);
+        if (base[i] < 33) base[i] += 33; // evitar caracteres no imprimibles
+    }
+
+    char* clave = malloc(pos + 1);
+    strcpy(clave, base);
+    return clave;
 }
 
 int validarClave(Persona* persona, const char* claveIngresada) {
-    // Parte de joey
+    // Generar clave esperada
+    char* claveEsperada = generarClave(persona);
 
-    return NULL;
+    int esValida = (strcmp(claveEsperada, claveIngresada) == 0);
+
+    free(claveEsperada);
+    return esValida;
 }
