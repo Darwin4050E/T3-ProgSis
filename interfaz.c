@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "interfaz.h"
+#include <string.h>   // para strcmp, strcpy, strlen, strcspn
+#include <ctype.h>    // para toupper
+#include <time.h>     // para time
 
 void asignarMemoriaDinamica(char* elemento, int tamano){
     elemento = (char*) calloc(tamano, sizeof(char));
@@ -207,7 +210,7 @@ void listarTodosLosUsuarios(Persona* lista, int total) {
 
 
 char* generarClave(Persona* persona) {
-    char base[16]; 
+    char base[16];
     int pos = 0;
 
     if (persona->nombres && strlen(persona->nombres) > 0)
@@ -225,23 +228,16 @@ char* generarClave(Persona* persona) {
 
     base[pos] = '\0';
 
-    srand(time(NULL));
-    for (int i = pos - 1; i > 0; i--) {
-        int j = rand() % (i + 1);
-        char tmp = base[i];
-        base[i] = base[j];
-        base[j] = tmp;
-    }
-
     for (int i = 0; i < pos; i++) {
         base[i] = (char)((base[i] + persona->codigo) % 126);
-        if (base[i] < 33) base[i] += 33; // evitar caracteres no imprimibles
+        if (base[i] < 33) base[i] += 33;
     }
 
     char* clave = malloc(pos + 1);
     strcpy(clave, base);
     return clave;
 }
+
 
 int validarClave(Persona* persona, const char* claveIngresada) {
     // Generar clave esperada
