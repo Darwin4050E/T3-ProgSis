@@ -20,6 +20,8 @@ typedef struct {
 void liberarMemoriaDinamicaPersona(Persona* persona);
 void asignarMemoriaDinamica(char* elemento, int tamano);
 void liberarMemoriaDinamica(char* elemento);
+void mostrarDatosPersona(Persona persona);
+void listarTodosLosUsuarios(Persona* lista, int total);
 
 
 // ===== Validación y Búsqueda =====
