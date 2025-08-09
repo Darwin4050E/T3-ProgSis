@@ -1,12 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "interfaz.h"
-#include <string.h>   // para strcmp, strcpy, strlen, strcspn
-#include <ctype.h>    // para toupper
-#include <time.h>     // para time
+#include <string.h> 
+#include <ctype.h>
 
-void asignarMemoriaDinamica(char* elemento, int tamano){
-    elemento = (char*) calloc(tamano, sizeof(char));
+void asignarMemoriaDinamica(char** elemento, int tamano){
+    *elemento = (char*) calloc(tamano, sizeof(char));
 }
 
 void liberarMemoriaDinamica(char* elemento){
@@ -25,20 +24,9 @@ void liberarMemoriaDinamicaPersona(Persona* persona) {
     free(persona->clave); 
 }
 
-/*
-int validarRepeticionCedula(Persona* personas, int tamano, char* cedula){
-    for(int i = 0; i < tamano; i++){
-        if(personas->cedula == cedula){
-            return -1;
-        }
-        personas++;
-    }
-    return 0;
-} */
-
 int validarRepeticionCedula(Persona* personas, int tamanoActual, const char* cedula) {
     for (int i = 0; i < tamanoActual; i++) {
-        // El operador '==' solo compara las direcciones de memoria.
+        // El operador == solo compara las direcciones de memoria.
         if (strcmp(personas[i].cedula, cedula) == 0) {
             return -1; // repetida
         }
@@ -82,14 +70,14 @@ void leerEntero(int *numero, const char *indicacion, int minVal, int maxVal) {
         printf(">>> %s [%d-%d]: ", indicacion, minVal, maxVal);
         if (scanf("%d", numero) != 1) {
             printf("  [!] Entrada inválida. Debe ser un número. Intenta de nuevo.\n");
-            while ((c = getchar()) != '\n' && c != EOF); // Limpiar buffer de entrada
+            while ((c = getchar()) != '\n' && c != EOF); // Limpiar buffer 
             *numero = minVal - 1; // Forzar a que el bucle continúe
             continue;
         }
         if (*numero < minVal || *numero > maxVal) {
             printf("  [!] El número debe estar entre %d y %d. Intenta de nuevo.\n", minVal, maxVal);
         }
-        while ((c = getchar()) != '\n' && c != EOF); // Limpiar buffer de entrada para el siguiente fgets
+        while ((c = getchar()) != '\n' && c != EOF); // Limpiar buffer 
     } while (*numero < minVal || *numero > maxVal);
 }
 
@@ -129,7 +117,7 @@ void registrarUsuario(Persona *nuevoUsuario, Persona* listaCompleta, int totalUs
     printf("\n-- Usuario registrado exitosamente --\n");
     printf("===========================================\n");
     printf("  Usuario de Acceso: %s\n", nuevoUsuario->cedula);
-    printf("  CLAVE GENERADA: %s\n", nuevoUsuario->clave);
+    printf("  Clave Generada: %s\n", nuevoUsuario->clave);
     printf("===========================================\n");
 }
 
@@ -189,10 +177,7 @@ void modificarUsuario(Persona* listaPersonas, int totalUsuarios) {
     usuarioAModificar->clave = generarClave(usuarioAModificar);
     
     printf("\n[✓] Datos guardados exitosamente.\n");
-    printf("===========================================\n");
-    printf("  SE HA GENERADO UNA NUEVA CLAVE:\n");
-    printf("  NUEVA CLAVE: %s\n", usuarioAModificar->clave);
-    printf("===========================================\n");
+    printf("[✓] Clave actualizada...\n");
 }
 
 void listarTodosLosUsuarios(Persona* lista, int total) {
@@ -213,38 +198,51 @@ char* generarClave(Persona* persona) {
     char base[16];
     int pos = 0;
 
-    if (persona->nombres && strlen(persona->nombres) > 0)
-        base[pos++] = toupper(persona->nombres[0]);
-    if (persona->apellidos && strlen(persona->apellidos) > 0)
-        base[pos++] = toupper(persona->apellidos[0]);
-    if (persona->ciudadResidencia && strlen(persona->ciudadResidencia) > 0)
-        base[pos++] = toupper(persona->ciudadResidencia[0]);
-    if (persona->profesion && strlen(persona->profesion) > 0)
-        base[pos++] = toupper(persona->profesion[0]);
-    if (persona->estadoCivil && strlen(persona->estadoCivil) > 0)
-        base[pos++] = toupper(persona->estadoCivil[0]);
-    if (persona->rol && strlen(persona->rol) > 0)
-        base[pos++] = toupper(persona->rol[0]);
-
+    if (persona->nombres && strlen(persona->nombres) > 0) base[pos++] = toupper(persona->nombres[0]);
+    if (persona->apellidos && strlen(persona->apellidos) > 0) base[pos++] = toupper(persona->apellidos[0]);
+    if (persona->ciudadResidencia && strlen(persona->ciudadResidencia) > 0) base[pos++] = toupper(persona->ciudadResidencia[0]);
+    if (persona->profesion && strlen(persona->profesion) > 0) base[pos++] = toupper(persona->profesion[0]);
+    if (persona->estadoCivil && strlen(persona->estadoCivil) > 0) base[pos++] = toupper(persona->estadoCivil[0]);
+    if (persona->rol && strlen(persona->rol) > 0) base[pos++] = toupper(persona->rol[0]);
     base[pos] = '\0';
 
-    for (int i = 0; i < pos; i++) {
-        base[i] = (char)((base[i] + persona->codigo) % 126);
-        if (base[i] < 33) base[i] += 33;
+    int len = strlen(base);
+    if (len == 0) {
+        char* clave_vacia = malloc(5);
+        strcpy(clave_vacia, "0000");
+        return clave_vacia;
+    }
+    
+    srand(persona->codigo);
+    for (int i = len - 1; i > 0; i--) {
+        int j = rand() % (i + 1);
+        char temp = base[i];
+        base[i] = base[j];
+        base[j] = temp;
     }
 
-    char* clave = malloc(pos + 1);
-    strcpy(clave, base);
-    return clave;
+    char xor_key[4];
+    sprintf(xor_key, "%d", persona->codigo);
+    int key_len = strlen(xor_key);
+
+    char encrypted_base[16];
+    for (int i = 0; i < len; i++) {
+        encrypted_base[i] = base[i] ^ xor_key[i % key_len];
+    }
+
+    char* clave_final = malloc(len * 2 + 1);
+    for (int i = 0; i < len; i++) {
+        sprintf(&clave_final[i * 2], "%02X", (unsigned char)encrypted_base[i]);
+    }
+    clave_final[len * 2] = '\0';
+
+    return clave_final;
 }
 
 
 int validarClave(Persona* persona, const char* claveIngresada) {
-    // Generar clave esperada
     char* claveEsperada = generarClave(persona);
-
     int esValida = (strcmp(claveEsperada, claveIngresada) == 0);
-
     free(claveEsperada);
     return esValida;
 }

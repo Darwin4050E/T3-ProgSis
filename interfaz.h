@@ -18,7 +18,7 @@ typedef struct {
 
 // ===== Gestión de Memoria  =====
 void liberarMemoriaDinamicaPersona(Persona* persona);
-void asignarMemoriaDinamica(char* elemento, int tamano);
+void asignarMemoriaDinamica(char** elemento, int tamano);
 void liberarMemoriaDinamica(char* elemento);
 void mostrarDatosPersona(Persona persona);
 void listarTodosLosUsuarios(Persona* lista, int total);
