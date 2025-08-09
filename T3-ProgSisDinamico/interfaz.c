@@ -177,7 +177,10 @@ void modificarUsuario(Persona* listaPersonas, int totalUsuarios) {
     usuarioAModificar->clave = generarClave(usuarioAModificar);
     
     printf("\n[✓] Datos guardados exitosamente.\n");
-    printf("[✓] Clave actualizada...\n");
+    printf("===========================================\n");
+    printf("  Se ha generado una nueva clave:\n");
+    printf("  Nueva Clave: %s\n", usuarioAModificar->clave);
+    printf("===========================================\n");
 }
 
 void listarTodosLosUsuarios(Persona* lista, int total) {
@@ -192,7 +195,6 @@ void listarTodosLosUsuarios(Persona* lista, int total) {
         printf("-----------------------\n");
     }
 }
-
 
 char* generarClave(Persona* persona) {
     char base[16];
@@ -225,20 +227,17 @@ char* generarClave(Persona* persona) {
     sprintf(xor_key, "%d", persona->codigo);
     int key_len = strlen(xor_key);
 
-    char encrypted_base[16];
-    for (int i = 0; i < len; i++) {
-        encrypted_base[i] = base[i] ^ xor_key[i % key_len];
-    }
+    char* clave_final = malloc(len + 1);
 
-    char* clave_final = malloc(len * 2 + 1);
     for (int i = 0; i < len; i++) {
-        sprintf(&clave_final[i * 2], "%02X", (unsigned char)encrypted_base[i]);
+        unsigned char encrypted_char = base[i] ^ xor_key[i % key_len];
+        clave_final[i] = (encrypted_char % 94) + 33;
     }
-    clave_final[len * 2] = '\0';
+    
+    clave_final[len] = '\0';
 
     return clave_final;
 }
-
 
 int validarClave(Persona* persona, const char* claveIngresada) {
     char* claveEsperada = generarClave(persona);

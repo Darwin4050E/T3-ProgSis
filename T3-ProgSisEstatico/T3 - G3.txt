@@ -1,0 +1,17 @@
+Grupo #3
+
+Integrantes:
+
+ - Bustamante Sanlucas Joey Patricio (Líder)
+ - Diaz González Darwin Leonardo (Ayudante 1)
+ - Tumbaco Santana Gabriel Alejandro (Ayudante 2)
+
+Motivo de selección del líder:
+
+Joey Bustamante es una persona dedicada al estudio de la programación. Además, cuenta con las habilidades necesarias para liderar un equipo.
+
+División del taller:
+
+ - Bustamante Joey (Módulo de seguridad y menú principal)
+ - Diaz Darwin (Módulo de gestión de usuarios y memoria)
+ - Tumbaco Gabriel (Módulo de registro y modificación de datos)
